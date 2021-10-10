@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <ctype.h>
 using namespace std;
 
 struct pipe     //труба
@@ -17,187 +18,265 @@ struct comp_st     // компрессорная станция
 	double efficency;
 };
 
+void type_pipe (pipe &my_pipe)	//проверка типа и ввод данных трубы
+{	//инициализация
+	double input_double=my_pipe.length;
+	int input=my_pipe.diametr;
+	while(true)
+	{
+	//проверка длины
+	cout<<"Введите длину трубы"<<endl;
+	while(!(cin>>input_double))
+	{
+	cin.clear();
+	cin.ignore(10000,'\n');
+	system("clear");
+	cout<<"Введён неверный символ, введите длину заново"<<endl;	
+	}
+	system("clear");
+	cout<<"Длина введена"<<endl;
+	my_pipe.length=input_double;
+	cin.ignore(10000,'\n');
+	system("clear");
+	//проверка диаметра
+	cout<<"Введите диаметр трубы"<<endl;
+	while(!(cin>>input))
+	{
+	cin.clear();
+	cin.ignore(10000,'\n');
+	system("clear");
+	cout<<"Введён неверный символ, введите диаметр заново"<<endl;
+	}
+	system("clear");
+	cout<<"Диаметр введён"<<endl;
+	my_pipe.diametr=input;
+	cin.ignore(10000,'\n');
+	if (my_pipe.length < 1 || my_pipe.diametr < 0 || my_pipe.diametr>1420)
+	{
+		cin.clear();
+		system("clear");
+		cout<<"Произошла ошибка, выполните ввод заново"<<endl;
+	}
+	else break;
+}
+}
+
+void type_KS (comp_st & c_st) //проверка типа и ввод данных КС
+{	
+	//инициализация
+	int ceh_input, ceh_INwork_input;
+	double efficency_input;
+
+	//проверка цехов
+	cout<<"Введите количество цехов"<<endl;
+	while(true)
+	{
+	while(!(cin>>ceh_input))
+	{
+	cin.clear();
+	cin.ignore(10000,'\n');
+	system("clear");
+	cout<<"Введён неверный символ, введите количество цехов заново"<<endl;	
+	}
+	cout<<"Количество цехов введено"<<endl;
+	c_st.ceh_amount=ceh_input;
+	cin.ignore(10000,'\n');
+	system("clear");
+	//проверка цехов в работе
+	cout<<"Введите количество работающих цехов"<<endl;
+	while(!(cin>>ceh_INwork_input))
+	{
+	cin.clear();
+	cin.ignore(10000,'\n');
+	system("clear");
+	cout<<"Введён неверный символ, введите количество работающих цехов заново"<<endl;	
+	}
+	cout<<"Количество работающих цехов введено"<<endl;
+	c_st.ceh_INwork_amount=ceh_INwork_input;
+	cin.ignore(10000,'\n');
+	system("clear");
+
+	cout<<"Введите эффективность"<<endl;
+	while(!(cin>>efficency_input))
+	{
+	cin.clear();
+	cin.ignore(10000,'\n');
+	system("clear");
+	cout<<"Введён неверный символ, введите эффективность заново"<<endl;	
+	}
+	cout<<"Эффективность введена"<<endl;
+	c_st.efficency=efficency_input;
+	cin.ignore(10000,'\n');
+	system("clear");
+
+	if(c_st.ceh_amount<c_st.ceh_INwork_amount || c_st.ceh_amount<0 || c_st.ceh_INwork_amount<0 || c_st.efficency<0.0 || c_st.efficency>100.0) 
+{
+	cin.clear();
+	system("clear"); 
+	cout<<"Произошла ошибка, выполните ввод заново!"<<endl;
+	}
+	else break;
+	}
+}
+
 void vvod_pipe(pipe &my_pipe)  //ввод данных о трубе с клавиатуры
 {
-cout<<"Введите длину трубы"<<endl;
-cin>>my_pipe.length;
-cout<<"Введите диаметр трубы"<<endl;
-cin>>my_pipe.diametr;
-if(my_pipe.diametr<0||my_pipe.diametr>1420) {system("clear"); cout<<"Вы ввели недопустимый диаметр трубы"<<endl;my_pipe.diametr=-1;}
-else if(my_pipe.length<1) {system("clear"); cout<<"Вы ввели недопустимую длину трубы"<<endl;my_pipe.length=-1;}
+++my_pipe.id;
+type_pipe(my_pipe);
+if(my_pipe.length<=0 || my_pipe.diametr<=0 || my_pipe.diametr>1420)
+{
+	system("clear");
+	cout << "Данные введены неверно" << endl;
+}
 }
 
 void vvod_KS(comp_st &c_st)  //ввод данных о КС с клавиатуры
 {
+++c_st.id;
 cout<<"Введите название КС"<<endl;
 cin>>c_st.ks_name;
-cout<<"Введите количество цехов"<<endl;
-cin>>c_st.ceh_amount;
-cout<<"Введите количество работающих цехов"<<endl;
-cin>>c_st.ceh_INwork_amount;
-if(c_st.ceh_amount<c_st.ceh_INwork_amount) {system("clear"); cout<<"Вы ввели недопустимые значения для цехов"<<endl;c_st.ceh_amount=-1;c_st.ceh_INwork_amount=-1;}
-if(c_st.ceh_amount<0||c_st.ceh_INwork_amount<0) {system("clear"); cout<<"Вы ввели недопустимые значения для цехов"<<endl;c_st.ceh_amount=-1;c_st.ceh_INwork_amount=-1;}
+type_KS(c_st);
 }
 
 void vvod(pipe &my_pipe, comp_st &c_st)  //ввод данных из файла
 {
-	int data;
-	string transform;
-	
-	if(my_pipe.id==0) {system("clear"); cout<<"Вы не ввели ни одной трубы"<<endl; }
-	else if(c_st.id==0) { system("clear"); cout<<"Вы не ввели ни одной КС"<<endl;}
-	else
-	{
-	cout<<"1. Хочу ввести данные с клавиатуры" <<endl
-	<<"2. Хочу ввести данные из файла" << endl
-	<<"3. Хочу выйти в главное меню"<<endl;
-	cin>>transform;
-	if(transform=="1"||transform=="2"||transform=="3")
-		data=atoi(transform.c_str());
-	else {system("clear"); cout<<"Вы ввели неверные данные!"<<endl;}
-	if(data==1)
-	{
-		vvod_pipe(my_pipe);
-		vvod_KS(c_st);
-		system("clear");
-		cout<<"Данные введены!"<<endl;
-	}
-	else if(data==2)
-	{
 		ifstream fin;
-fin.open("/home/mikhail/vim/semester3/laboratory-works/input_data.txt");
+		fin.open("/home/mikhail/vim/semester3/laboratory-works/info_lab1.txt");
 if (fin.is_open())
 {
-	fin>>my_pipe.length>>my_pipe.diametr>>c_st.ks_name>>c_st.ceh_amount>>c_st.ceh_INwork_amount;
-	if(my_pipe.diametr<0||my_pipe.diametr>1420) {system("clear");cout<<"Вы ввели недопустимый диаметр трубы"<<endl;my_pipe.diametr=-1;}
-	else if(my_pipe.length<1) {system("clear");cout<<"Вы ввели недопустимую длину трубы"<<endl;my_pipe.length=-1;}
-	else if(c_st.ceh_amount<c_st.ceh_INwork_amount) {system("clear");cout<<"Вы ввели недопустимые значения для цехов"<<endl;c_st.ceh_amount=-1;c_st.ceh_INwork_amount=-1;}
-	else if(c_st.ceh_amount<0||c_st.ceh_INwork_amount<0) {system("clear");cout<<"Вы ввели недопустимые значения для цехов"<<endl;c_st.ceh_amount=-1;c_st.ceh_INwork_amount=-1;}
-	else {system("clear"); cout<<"Данные введены!"<<endl;}
+	fin >> my_pipe.id >> my_pipe.length >> my_pipe.diametr >> my_pipe.in_repair
+		>> c_st.id >> c_st.ks_name >> c_st.ceh_amount >> c_st.ceh_INwork_amount >> c_st.efficency;
+	if(my_pipe.diametr<=0||my_pipe.diametr>1420) 
+	{
+		fin.clear();
+		system("clear");
+		cout<<"Вы ввели недопустимый диаметр трубы"<<endl;
+		}
+	else if(my_pipe.length<1) 
+	{
+		fin.clear();
+		system("clear");
+		cout<<"Вы ввели недопустимую длину трубы"<<endl;
+		}
+	else if(c_st.ceh_amount<c_st.ceh_INwork_amount || c_st.ceh_amount<0||c_st.ceh_INwork_amount<0 || c_st.efficency < 0.0 || c_st.efficency > 100.0) 
+	{
+		fin.clear();
+		system("clear");
+		cout<<"Вы ввели недопустимые значения"<<endl;
+		}
 }
 fin.close();
+system("clear");
+cout<<"Данные введены"<<endl;
 	}
-	else if(data==3) {system("clear");cout<<"Вы вышли в главное меню!"<<endl;}
-	else {system("clear");cout<<"Введено неправильное значение"<<endl;}
-	}
-}
 
 void change_repair(pipe &my_pipe) //редактирование трубы
 {
-	system("clear");
-if (my_pipe.in_repair==0) {my_pipe.in_repair=1; cout<<"Труба отредактирована!"<<endl;}
-else if(my_pipe.in_repair==1) {my_pipe.in_repair=0; cout<<"Труба отредактирована!"<<endl;}
-else {system("clear");cout<<"Вы ввели неверное значение"<<endl;}
+system("clear");
+if(my_pipe.id>0)
+{
+if (my_pipe.in_repair==0) 
+{
+	my_pipe.in_repair=1; 
+	cout<<"Труба отредактирована!"<<endl;
+	}
+else if(my_pipe.in_repair==1) 
+{
+	my_pipe.in_repair=0; 
+	cout<<"Труба отредактирована!"<<endl;
+	}
+}
 }
 
 void change_KS(comp_st &c_st) //редактирование КС
 {
-	int t,result,amount_down,amount_up,result_eff;
-	double amount_eff_up,amount_eff_down;
+	int t;
 	cout<<"1. Хочу изменить количество работающих цехов"<<endl
-		<<"2. Хочу изменить значение эффективности КС"<<endl
-		<<"3. Хочу выйти в главное меню"<<endl;
+		<<"2. Хочу изменить значение эффективности КС"<<endl;
 	cin>>t;
 	if(t==1)
 	{
-		cout<<"1. Хочу увеличить количество работающих цехов"<<endl
-			<<"2. Хочу уменьшить количество работающих цехов"<<endl
-			<<"3. Хочу выйти в главное меню"<<endl;
-		cin>>result;
-		if(result==1) 
+		while (true)
 		{
-			cout<<"На сколько?"<<endl;
-			cin>>amount_up;
-			c_st.ceh_INwork_amount=c_st.ceh_INwork_amount+amount_up;
-			if(c_st.ceh_INwork_amount>c_st.ceh_amount) {system("clear");cout<<"Произошла ошибка"<<endl; c_st.ceh_INwork_amount=-1;}
+			cout<<"Введите изменённое количество работающих цехов"<<endl;
+			cin>>c_st.ceh_INwork_amount;
+			if(c_st.ceh_INwork_amount>c_st.ceh_amount) 
+			{
+				cin.clear();
+				cin.ignore(10000,'\n');
+				system("clear");
+				cout<<"Произошла ошибка"<<endl; 
+				}
+			else break;
+		}	
 		}
-		else if (result==2)
-		{
-			cout<<"На сколько?"<<endl;
-			cin>>amount_down;
-			c_st.ceh_INwork_amount=c_st.ceh_INwork_amount-amount_down;
-			if(c_st.ceh_INwork_amount<0) {system("clear");cout<<"Ошибка в параметре"<<endl; c_st.ceh_INwork_amount=-1;}
-		}
-		else if(result==3) {system("clear");cout<<"Вы вышли в главное меню!"<<endl;}
-		else {system("clear");cout<<"Вы ввели неправильное значение!"<<endl;}
-	}
 	else if (t==2)
 	{
-	cout<<"1. Хочу увеличить эффективность"<<endl
-			<<"2. Хочу уменьшить эффективность"<<endl
-			<<"3. Хочу выйти в главное меню"<<endl;
-		cin>>result_eff;
-		if(result_eff==1) 
+		while (true)
 		{
-			cout<<"На сколько?"<<endl;
-			cin>>amount_eff_up;
-			c_st.efficency=c_st.efficency+amount_eff_up;
-			if(c_st.efficency>100.0) {system("clear");cout<<"Произошла ошибка"<<endl;c_st.efficency=-1;}
+			cout<<"Введите изменённую эффективность"<<endl;
+			cin>>c_st.efficency;
+			if(c_st.efficency>100.0) 
+			{
+				cin.clear();
+				cin.ignore(10000,'\n');
+				system("clear");
+				cout<<"Произошла ошибка"<<endl;
+				}
+			else if(c_st.efficency<0.0) 
+			{
+				cin.clear();
+				cin.ignore(10000,'\n');
+				system("clear");
+				cout<<"Произошла ошибка"<<endl;
+				}
+			else break;
 		}
-		else if (result_eff==2)
-		{
-			cout<<"На сколько?"<<endl;
-			cin>>amount_eff_down;
-			c_st.efficency=c_st.efficency-amount_eff_down;
-			if(c_st.efficency<0.0) {system("clear");cout<<"Произошла ошибка"<<endl;c_st.efficency=-1;}
-		}
-		else if(result_eff==3) {system("clear");cout<<"Вы вышли в главное меню"<<endl;}
-		else {system("clear");cout<<"Вы ввели неправильное значение!"<<endl;}
 	}
-	else if(t==3) {system("clear"); cout<<"Вы вышли в главное меню!"<<endl;}
-	else {system("clear");cout<<"Вы ввели неправильное значение!"<<endl;}
+	else 
+	{
+		system("clear");
+		cout<<"Вы ввели неправильное значение!"<<endl;
+		}
 }
+
 
 void vivod_pipe (pipe &my_pipe) //вывод данных о трубе
 {
 	system("clear");
-cout << "Данные, собранные по указанной пользователем трубе:" <<endl
-	<< "Идентификатор трубы: " << my_pipe.id << endl
-    << "Длина данной трубы: " << my_pipe.length << ' ' << "метров" << endl
-	<< "Диаметр данной трубы: " << my_pipe.diametr << ' ' << "миллиметров" <<endl
-   	<< "Статус трубы: "<<(my_pipe.in_repair?"В ремонте":"Не в ремонте")<<endl;
+cout << "Данные по трубе:" <<endl
+	<< "Идентификатор: " << my_pipe.id << endl
+    << "Длина: " << my_pipe.length << ' ' << "метров" << endl
+	<< "Диаметр: " << my_pipe.diametr << ' ' << "миллиметров" <<endl
+   	<< "Статус: "<<(my_pipe.in_repair?"подключён":"Не подключён")<<endl;
 }
 
 
 void vivod_KS(comp_st &c_st) //вывод данных о КС
 {
-cout << endl << "Данные, собранные по указанной пользователем КС" << endl
-	 << "Идентификатор КС: " << c_st.id << endl
-	 << "Название КС: " << c_st.ks_name << endl
-	 << "Количество цехов на данной КС: " << c_st.ceh_amount <<endl
-	 << "Количество работающих цехов на данный момент: " << c_st.ceh_INwork_amount << endl
-	 << "Эффективность КС: "<<c_st.efficency;
+cout << endl << "Данные по КС" << endl
+	 << "Идентификатор: " << c_st.id << endl
+	 << "Название: " << c_st.ks_name << endl
+	 << "Общее количество цехов: " << c_st.ceh_amount <<endl
+	 << "Количество работающих цехов: " << c_st.ceh_INwork_amount << endl
+	 << "Эффективность: "<<c_st.efficency <<" %"<< endl;
 }
 
-void save_pipe(pipe &my_pipe)  //запись данных о трубе в файл
+void save_file(pipe &my_pipe, comp_st &c_st)  //запись данных о трубе в файл
 {
 ofstream out;
-out.open("/home/mikhail/vim/semester3/laboratory-works/info_lab1.txt",ios::app);
+out.open("/home/mikhail/vim/semester3/laboratory-works/info_lab1.txt");
 if(out.is_open())
 	{
-		out << "Данные, собранные по указанной пользователем трубе:" <<endl
-	<< "Идентификатор трубы: " << my_pipe.id << endl
-    << "Длина данной трубы: " << my_pipe.length << ' ' << "метров" << endl
-	<< "Диаметр данной трубы: " << my_pipe.diametr << ' ' << "миллиметров" <<endl
-   	<< "Статус трубы: "<<(my_pipe.in_repair?"В ремонте":"Не в ремонте")<<endl;
-	}
-	out.close();
-
-}
-
-void save_KS(comp_st &c_st)  //запись данных о КС в файл
-{
-system("clear");
-ofstream out;
-out.open("/home/mikhail/vim/semester3/laboratory-works/info_lab1.txt",ios::app);
-if(out.is_open())
-	{
-		out << endl << "Данные, собранные по указанной пользователем КС" << endl
-	 << "Идентификатор КС: " << c_st.id << endl
-	 << "Название КС: " << c_st.ks_name << endl
-	 << "Количество цехов на данной КС: " << c_st.ceh_amount <<endl
-	 << "Количество работающих цехов на данный момент: " << c_st.ceh_INwork_amount << endl
-	 << "Эффективность КС: "<<c_st.efficency;
+		out << my_pipe.id << endl
+    		<< my_pipe.length << endl
+			<< my_pipe.diametr << endl
+   			<< my_pipe.in_repair << endl;
+	    out << c_st.id << endl
+	 		<< c_st.ks_name << endl
+	 		<< c_st.ceh_amount <<endl
+	 		<< c_st.ceh_INwork_amount << endl
+	 		<<c_st.efficency <<endl;
 	}
 	out.close();
 
@@ -224,70 +303,95 @@ void menu(pipe &my_pipe,comp_st &c_st)  //меню
 	case 1:
 	
 			if(my_pipe.id<1)
-			{++my_pipe.id;
+			{
 			system("clear");
-			cout<<"Труба добавлена!"<<endl;}
-			else {system("clear"); cout<<"Было добавлено максимальное количество труб!"<<endl;}
-		//system("clear");
+			vvod_pipe(my_pipe);
+			cout<<"Труба добавлена!"<<endl;
+			}
+			else 
+			{
+				system("clear"); 
+				cout<<"Было добавлено максимальное количество труб!"<<endl;
+			}
 		break;
 	case 2:
 	
 			if(c_st.id<1)
-			{++c_st.id;
+			{
 			system("clear");
-			cout<<"КС добавлена!"<<endl;}
-			else {system("clear");cout<<"Добавлено максимальное количество КС"<<endl;}
-		//system("clear");
+			vvod_KS(c_st);
+			cout<<"КС добавлена!"<<endl;
+			}
+			else 
+			{
+				system("clear");
+				cout<<"Добавлено максимальное количество КС"<<endl;
+				}
 		break;
 	case 3:
-	if(my_pipe.diametr==0 && my_pipe.length==0 && c_st.ceh_amount==0 && c_st.ceh_INwork_amount==0) {system("clear");cout<<"Выполните ввод данных"<<endl;}
+	if(my_pipe.diametr==0 && my_pipe.length==0 && c_st.ceh_amount==0 && c_st.ceh_INwork_amount==0) 
+	{
+		system("clear");
+		cout<<"Выполните ввод данных"<<endl;
+	}
 	else	
-	{	cout<<endl;
-		if(my_pipe.diametr!=-1 && my_pipe.length!=-1 && c_st.ceh_amount!=-1 && c_st.ceh_INwork_amount!=-1)
-		{vivod_pipe(my_pipe);
+	{	
+		vivod_pipe(my_pipe);
 		vivod_KS(c_st);
-		cout << endl<<endl;}
-		else {system("clear");cout<<"Были неправильно введены данные, введите данные заново"<<endl;}
 	}
 		break;
 	case 4:
-		change_repair(my_pipe);
+		if(my_pipe.id==0)
+		{
+			system("clear");
+			cout<<"Вы не ввели ни одной трубы для редактирования!"<<endl;
+		}
+		else
+			change_repair(my_pipe);
 		break;
 	case 5:
-	
-	if(c_st.efficency!=-1 && c_st.ceh_INwork_amount!=-1 && c_st.efficency!=0 && c_st.ceh_INwork_amount!=0)
-		{change_KS(c_st);
-		system("clear");
-		cout<<"КС отредактирована!"<<endl;}
-		else {system("clear"); cout<<"Вы ввели недостаточно данных"<<endl;}
+	if(c_st.efficency!=0 && c_st.ceh_INwork_amount!=0)
+		{
+		change_KS(c_st);
+		//system("clear");
+		//cout<<"КС отредактирована!"<<endl;
+		}
+		else 
+		{
+			system("clear"); 
+			cout<<"Вы ввели недостаточно данных"<<endl;
+		}
 		break;
 	case 6:
 		if(my_pipe.id>0 && c_st.id>0 && my_pipe.length>0 && my_pipe.diametr>0 && c_st.ceh_amount>0 && c_st.ceh_INwork_amount>0)
-		{save_KS(c_st);
-		save_pipe(my_pipe);}
-		else {system("clear"); cout<<"Вы ввели недостаточно данных для сохранения в файл"<<endl;}
+		{
+		save_file(my_pipe, c_st);
+		system("clear");
+		cout<<"Данные сохранены"<<endl;
+		}
+		else 
+		{
+			system("clear"); 
+			cout<<"Вы ввели недостаточно данных для сохранения в файл"<<endl;
+		}
 		break;
 	case 7:
-		if(my_pipe.id>0 && c_st.id>0)
-			vvod(my_pipe,c_st);	
-		else if (my_pipe.id==0) {system("clear"); cout<<"Вы не ввели ни одной трубы"<<endl;}
-		else {system("clear"); cout<<"Вы не ввели ни одной КС"<<endl;}
+		vvod(my_pipe,c_st);	
 		break;
 	case 0:
-		cout<<"Вы уверены, что хотите выйти из программы?"<<endl
-			<<"1. Да "<<endl
-			<<"2. Нет"<<endl;
-		 cin>>y;
-		 if(y==1) exit(0);
-		 else if (y==2) system("clear");
-		 else {system("clear"); cout<<"Было введено неправильное значение"<<endl;}
+		exit(0);
 		break;
 	default:
 		system("clear");
 		cout<<"Ошибка при вводе!"<<endl;
 		break;
-	}}
-	else {system("clear"); cout<<"Вы ввели неверные данные!"<<endl;}
+	}
+	}
+	else 
+	{
+		system("clear");
+		cout<<"Вы ввели неверные данные!"<<endl;
+	}
 	}
 }	
 
@@ -300,7 +404,7 @@ int main()
 	//задекларировали в мэйне параметры трубы
 	my_pipe.id=0, my_pipe.length=0.00, my_pipe.in_repair=0, my_pipe.diametr=0;
 	//задекларировали в мэйне параметры кс
-	c_st.id=0, c_st.ceh_amount=0, c_st.ceh_INwork_amount=0, c_st.efficency=75.2;
+	c_st.id=0, c_st.ceh_amount=0, c_st.ceh_INwork_amount=0, c_st.efficency=0.0;
 	//вызов меню
 	system("clear");
 	menu(my_pipe,c_st);
