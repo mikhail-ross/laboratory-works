@@ -1,4 +1,4 @@
+*.json
 *.out
-.vscode
 *.class
 main.exe
