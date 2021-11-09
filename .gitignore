@@ -2,3 +2,5 @@
 *.out
 *.class
 main.exe
+*.exe
+*o
