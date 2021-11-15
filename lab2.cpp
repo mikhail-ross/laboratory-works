@@ -8,7 +8,57 @@
 #include "ks.h"
 using namespace std;
 
+int id_pipe=0, id_ks=0, res_id=0;
 
+/*using Filter = bool(*)(const unordered_map<int,pipe> &pipemap, bool param);
+bool CheckByRepair(const unordered_map<int,pipe> &pipemap, bool param)
+{
+	return pipemap.second.in_repair=param;
+}
+
+unordered_map<int,pipe> find_by_filter(const pipe& my_pipe, const unordered_map<int,pipe> &pipemap, Filter f, bool repair)
+{
+	unordered_map<int,pipe> res;
+	for(pair<int,pipe> elm : pipemap)
+	{
+		if(f(elm,repair))
+		{
+			res_id=elm.first;
+			res.insert({res_id,my_pipe});
+		}
+	} 
+	return res;
+}
+*/
+
+template <typename T, typename T_param>
+using Filter = bool(*)(const T &map, T_param param);
+bool pipe_check_name(const pipe &my_pipe, string param)
+{
+	return my_pipe.pipe_name==param;
+}
+bool check_repair(const pipe &my_pipe, bool param)
+{
+	return my_pipe.in_repair==param;
+}
+bool ks_check_name(const comp_st& c_st, string param)
+{
+	return c_st.ks_name==param;
+}
+bool check_by_ceh_INwork(const comp_st& c_st, int param)
+{
+	return c_st.ceh_INwork_amount==param;
+}
+
+template<typename T, typename T_param>
+vector<int> find_by_filter(const unordered_map<int, T> &map, Filter<T,T_param> f, T_param param)
+{
+	vector<int> res;
+	for (auto & elm:map)
+		if(f(elm.second,param))
+			res.push_back(elm.first);
+	return res;
+}
 
 void vvod_pipe (pipe &my_pipe)	//проверка типа и ввод данных трубы
 {
@@ -36,7 +86,7 @@ void vvod_KS (comp_st &c_st) //проверка типа и ввод данны�
 
 void vvod_from_file(pipe &my_pipe, comp_st &c_st, unordered_map <int,pipe>& pipemap, unordered_map <int,comp_st>& ksmap)  //ввод данных из файла
 {
-	int id_pipe=my_pipe.id, id_ks=c_st.id;
+	//int id_pipe, id_ks;
     ifstream fin;
 	fin.open("/home/mikhail/vim/semester3/laboratory-works/info_lab.txt");
     if (!fin.is_open())
@@ -129,10 +179,7 @@ void delete_pipe(unordered_map <int,pipe>& pipemap)
 	else cout<<"выбранная труба не была найдена"<<endl;	
 }
 
-/*void filter()
-{
 
-}*/
 
 void delete_ks(unordered_map <int,comp_st>& ksmap)
 {
@@ -152,7 +199,7 @@ void vivod_pipe (const unordered_map <int,pipe>& pipemap) //вывод данн�
     for(pair<int,pipe> element : pipemap)
 			{
 				cout<<element.first<<endl
-				<<element.second.pipe_name<<' '
+				<<element.second.pipe_name<<"		"
 				<<element.second.length<<' '<< "км "
 				<<element.second.diametr<<' '<< "мм "
 				<<(element.second.in_repair?"подключён":"Не подключён")<<endl;
@@ -165,7 +212,7 @@ void vivod_KS(const unordered_map <int,comp_st>& ksmap) //вывод данны�
     for(pair<int,comp_st> element : ksmap)
 			{
 				cout<<element.first<<endl
-				<<"'"<<element.second.ks_name<<"'"<<' '
+				<<element.second.ks_name<<"		"
 				<<element.second.ceh_amount<<' '
 				<<element.second.ceh_INwork_amount<<' '
 				<<element.second.efficency<<"%"<<endl;
@@ -180,28 +227,51 @@ void save_file(const unordered_map <int,pipe>& pipemap, const unordered_map <int
 	{
 		for(pair<int, pipe> element : pipemap)
 		{
-		out << element.first << endl
+		out << element.first << " "
 			<< element.second.pipe_name << endl
-    		<< element.second.length << endl
-			<< element.second.diametr << endl
-   			<< element.second.in_repair << endl;
+    		<< element.second.length << " "
+			<< element.second.diametr << " "
+   			<< element.second.in_repair << " ";
 		}
-		out << '\n' << endl;
 		for(pair<int, comp_st> element : ksmap)
 		{
-		out << element.first << endl
+		out << element.first << " "
 	 		<< element.second.ks_name << endl
-	 		<< element.second.ceh_amount <<endl
-	 		<< element.second.ceh_INwork_amount << endl
-	 		<< element.second.efficency << endl;
+	 		<< element.second.ceh_amount << " "
+	 		<< element.second.ceh_INwork_amount << " "
+	 		<< element.second.efficency << " ";
 		}
         out.close();
 	}
 }
 
+void filter_pipe(unordered_map<int, pipe> &pipemap)
+{
+	if(pipemap.size()==0)
+			return;
+	cout<<"1. Фильтр по названию"<<endl
+		<<"2. Фильтр по признаку 'в ремонте'"<<endl;
+	int result=GetNumber(1,2);
+	string name;
+	if(result==1)
+	{
+		cin>>ws;
+		getline(cin,name);
+		vector<int> vec_ind = find_by_filter(pipemap, pipe_check_name, name);
+		for(auto &id: vec_ind)
+			cout<<id<<endl;//<<pipemap[id];
+	}
+	else
+	{
+		bool bool_repair=GetNumber(0,1);
+		vector<int> vec_ind = find_by_filter(pipemap, check_repair, bool_repair);
+		for(auto &id: vec_ind)
+			cout<<id<<endl;//<<pipemap[id];
+	}
+}
+
 void menu()
 {
-	//system("read -p 'press enter to continue... ' var");
 	system("clear");
 		cout<< "1. Добавить трубу" << endl
 			<< "2. Добавить КС" << endl
@@ -212,7 +282,8 @@ void menu()
 			<< "7. Ввести данные" << endl
 			<< "8. Удалить трубу" << endl
 			<< "9. Удалить КС" << endl
-			<< "10. Поиск по фильтру" << endl
+			<< "10. Фильтрация труб" << endl
+			<< "11. Фильтрация КС" << endl
 			<< "0. Выход" << endl;
 }
 
@@ -224,22 +295,21 @@ int main()
 	comp_st c_st;
 	unordered_map <int,pipe> pipemap;
 	unordered_map <int,comp_st> ksmap;
-	int id_pipe=my_pipe.id,id_ks=c_st.id;
 	while (true)
 	{
     menu();
-	switch (GetNumber(0, 10))
+	switch (GetNumber(0, 11))
 	{
     case 1:
 			{
-			id_pipe+=1;
+			++id_pipe;
 			vvod_pipe(my_pipe);
 			pipemap.insert({id_pipe, my_pipe});
 			}
 		break;
 	case 2:
 			{
-			id_ks+=1;
+			++id_ks;
 			vvod_KS(c_st);
 			ksmap.insert({id_ks,c_st});
 			}
@@ -252,7 +322,6 @@ int main()
             vivod_KS(ksmap);
 		if (id_pipe==0 && id_ks==0)
 			cout<<"Выполните ввод данных"<<endl;
-        system("read -p 'press enter to continue... ' var");
 		break;
     }
 	case 4:
@@ -260,23 +329,18 @@ int main()
 			cout<<"Вы не ввели ни одной трубы для редактирования!"<<endl;
 		else
 			change_repair(pipemap);
-		system("read -p 'press enter to continue... ' var");
 		break;
 	case 5:
         if (id_ks==0)
             cout<<"Вы не ввели ни одной КС для редактирования!"<<endl;
         else
-        {
             change_KS(ksmap);
-        }
-		system("read -p 'press enter to continue... ' var");
 		break;
 	case 6:
 		if(id_pipe>0 && id_ks>0)
 			save_file(pipemap, ksmap);
 		else
-			cout<<"Вы ввели недостаточно данных для сохранения в файл"<<endl;
-		system("read -p 'press enter to continue... ' var");	
+			cout<<"Вы ввели недостаточно данных для сохранения в файл"<<endl;	
 		break;
 	case 7:
 		vvod_from_file(my_pipe, c_st, pipemap, ksmap);
@@ -286,15 +350,18 @@ int main()
 		break;
 	case 9:
 		delete_ks(ksmap);
-		//system("read -p 'press enter to continue... ' var");
 		break;
 	case 10:
-		//filter();
+		filter_pipe(pipemap);
+		break;
+	case 11:
+		//filter_ks(ksmap);
 		break;
 	case 0:
         return 0;
 		break;
 	}
+	system("read -p 'press enter to continue... ' var");
 	}
 	return 0;
 }
