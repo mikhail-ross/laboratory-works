@@ -45,9 +45,9 @@ bool ks_check_name(const comp_st& c_st, string param)
 {
 	return c_st.ks_name==param;
 }
-bool check_by_ceh_INwork(const comp_st& c_st, int param)
+bool check_by_ceh_INwork(const comp_st& c_st, double param)
 {
-	return c_st.ceh_INwork_amount==param;
+	return (c_st.ceh_INwork_amount/c_st.ceh_amount)*100==param;
 }
 
 template<typename T, typename T_param>
@@ -258,15 +258,38 @@ void filter_pipe(unordered_map<int, pipe> &pipemap)
 		cin>>ws;
 		getline(cin,name);
 		vector<int> vec_ind = find_by_filter(pipemap, pipe_check_name, name);
-		for(auto &id: vec_ind)
-			cout<<id<<endl;//<<pipemap[id];
+		for(auto &id : vec_ind)
+			cout<<id<<pipemap[id];
 	}
 	else
 	{
 		bool bool_repair=GetNumber(0,1);
 		vector<int> vec_ind = find_by_filter(pipemap, check_repair, bool_repair);
-		for(auto &id: vec_ind)
-			cout<<id<<endl;//<<pipemap[id];
+		for(auto &id : vec_ind)
+			cout<<id<<pipemap[id];
+	}
+}
+
+void filter_ks(unordered_map<int, comp_st>& ksmap)
+{
+	if(ksmap.size()==0)
+		return;
+	int result=GetNumber(1,2);
+	string name;
+	if(result==1)
+	{
+		cin>>ws;
+		getline(cin,name);
+		vector<int> vec_ind = find_by_filter(ksmap, ks_check_name, name);
+		for(auto &id : vec_ind)
+			cout<<id<<ksmap[id];
+	}
+	else
+	{
+		double percent_INwork = GetNumber(0.0,100.0);
+		vector<int> vec_ind = find_by_filter(ksmap,check_by_ceh_INwork, percent_INwork);
+		for(auto &id : vec_ind)
+			cout<<id<<ksmap[id];
 	}
 }
 

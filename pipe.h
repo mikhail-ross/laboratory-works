@@ -10,7 +10,7 @@ public:
     bool in_repair;
     std::string pipe_name;
     pipe();
-    //friend std::ifstream& operator >> (std::ifstream& fin, pipe& my_pipe);
-	//friend std::ostream& operator << (std::ostream& out, const pipe& my_pipe);
+    friend std::istream& operator >> (std::istream& in, pipe& my_pipe);
+	friend std::ostream& operator << (std::ostream& out, const pipe& NewPipe);
     //void change_repair();
 };
