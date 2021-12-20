@@ -1,5 +1,9 @@
-2 rrr 
-345 432 0 1 qweqwe 
-234 345 0
-1 rabotaet? 
-12 1 5
+2 ertert
+345 345 0 
+1 werwer
+133 133 1
+
+2 ytr
+6 5 55 
+1 ert
+5 4 4 
