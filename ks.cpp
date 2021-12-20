@@ -43,4 +43,10 @@ istream &operator>>(istream &in, comp_st& NewKS)
 	NewKS.efficency=GetNumber(0.0,100.0);
     return in;
 }
-
+ifstream &operator>>(ifstream &fin, comp_st& NewKS)
+{
+    fin>>ws;
+    getline(fin, NewKS.ks_name);
+	fin>>NewKS.ceh_amount>>NewKS.ceh_INwork_amount>>NewKS.efficency;
+    return fin;
+}

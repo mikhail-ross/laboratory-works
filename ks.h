@@ -12,7 +12,7 @@ class comp_st     // компрессорная станция
 	double efficency;
 	friend std::istream& operator >> (std::istream& in, comp_st& NewKS);
 	friend std::ostream& operator << (std::ostream& out, const comp_st& ks);
-	//friend std::ifstream& operator >> (std::ifstream& fin, comp_st& NewKS);
+	friend std::ifstream& operator >> (std::ifstream& fin, comp_st& NewKS);
 	friend std::ofstream& operator << (std::ofstream& fout, const comp_st& ks);
     comp_st();
 };

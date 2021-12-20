@@ -39,10 +39,10 @@ vector<int> find_by_filter(const unordered_map<int, T> &map, Filter<T,T_param> f
 	return res;
 }
 
-void vvod_from_file(pipe &my_pipe, comp_st &c_st, unordered_map <int,pipe>& pipemap, unordered_map <int,comp_st>& ksmap)  //ввод данных из файла
+void vvod_from_file(pipe &NewPipe, comp_st &NewKS, unordered_map <int,pipe>& pipemap, unordered_map <int,comp_st>& ksmap)  //ввод данных из файла
 {
-	pipe NewPipe;
-	comp_st NewKS;
+	//pipe NewPipe;
+	//comp_st NewKS;
 	string result;
 	cout<<"Введите название файла: "<<endl;
 	cin>>ws;
@@ -57,32 +57,34 @@ void vvod_from_file(pipe &my_pipe, comp_st &c_st, unordered_map <int,pipe>& pipe
 	//int n = pipe::id_pipe;
 	//if(pipe::id_pipe>n) pipe
 	fin>>NewPipe;
+	//fin>>NewPipe.length >> NewPipe.diametr >> NewPipe.in_repair;
 	if(NewPipe.length<1 || NewPipe.diametr<=0||NewPipe.diametr>1420)
 	{
 	cout<<"Вы ввели недопустимые значения"<<endl;
-		c_st={};
-		my_pipe={};
+		NewKS={};
+		NewPipe={};
 		return;	
 	}
-	pipemap.insert ({pipe::id_pipe,my_pipe});
+	pipemap.insert ({pipe::id_pipe,NewPipe});
 	}
 
 	while(!fin.eof())
 	{
 	fin >> comp_st::id_ks;
-	fin>>ws;
-	getline(fin,c_st.ks_name);
-	fin >> c_st.ceh_amount >> c_st.ceh_INwork_amount >> c_st.efficency;
-	
-	if(c_st.ceh_amount<c_st.ceh_INwork_amount || c_st.ceh_amount<=0||c_st.ceh_INwork_amount<0 ||
-		 c_st.efficency < 0.0 || c_st.efficency > 100.0)
+	//fin>>ws;
+	//getline(fin,c_st.ks_name);
+	//fin >> c_st.ceh_amount >> c_st.ceh_INwork_amount >> c_st.efficency;
+	//fin>>NewKS.ceh_amount>>NewKS.ceh_INwork_amount>>NewKS.efficency;
+	fin>>NewKS;
+	if(NewKS.ceh_amount<NewKS.ceh_INwork_amount || NewKS.ceh_amount<=0||NewKS.ceh_INwork_amount<0 ||
+		 NewKS.efficency < 0.0 || NewKS.efficency > 100.0)
 	{
 		cout<<"Вы ввели недопустимые значения"<<endl;
-		c_st={};
-		my_pipe={};
+		NewPipe={};
+		NewKS={};
 		return;
     }
-	ksmap.insert ({comp_st::id_ks,c_st});
+	ksmap.insert ({comp_st::id_ks,NewKS});
     }
 	fin.close();
 }
